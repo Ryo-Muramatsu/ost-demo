@@ -2,10 +2,9 @@ version: '3.8'
 
 services:
   gh-ost:
-    # ローカル Dockerfile からビルドする設定
     build:
       context: .
-      dockerfile: Dockerfile  # 必要に応じてファイル名変更
+      dockerfile: Dockerfile
 
     # gh-ost を実行するコマンド
     command: >
@@ -22,7 +21,6 @@ services:
         --switch-to-rbr
         --execute
 
-    # 環境変数をサービスに渡す
     environment:
       MYSQL_NETWORK: ${MYSQL_NETWORK}
       MYSQL_CONTAINER: ${MYSQL_CONTAINER}
@@ -32,7 +30,6 @@ services:
       MYSQL_TABLE: ${MYSQL_TABLE}
       GH_OST_ALTER: ${GH_OST_ALTER}
 
-    # 既存の外部ネットワークを使用
     networks:
       - default
 
