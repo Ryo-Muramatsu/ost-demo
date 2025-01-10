@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  gh-ost:
+    image: ghcr.io/github/gh-ost:latest
+
+    # gh-ost 実行コマンド
+    command: >
+      gh-ost
+        --allow-on-master
+        --host=${MYSQL_CONTAINER}
+        --port=3306
+        --user=${MYSQL_USER}
+        --password=${MYSQL_PASSWORD}
+        --database=${MYSQL_DATABASE}
+        --table=${MYSQL_TABLE}
+        --verbose
+        --alter="${GH_OST_ALTER}"
+        --switch-to-rbr
+        --execute
+
+    # 既存コンテナを参照するために depends_on を指定 (ただし、外部コンテナの場合は実際には機能しません)
+    # 同じ docker-compose 内に MySQL サービスが定義されていない場合でも、名前解決とネットワークが合っていれば接続可能です
+    depends_on:
+      - ${MYSQL_CONTAINER}
+
+    # ネットワーク設定
+    networks:
+      - default
+
+# ネットワーク設定 (すでに外部で作成されているネットワーク名を使いたい場合)
+networks:
+  default:
+    name: ${MYSQL_NETWORK}
+    external: true
