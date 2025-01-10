@@ -2,9 +2,12 @@ version: '3.8'
 
 services:
   gh-ost:
-    image: ghcr.io/github/gh-ost:latest
+    # ローカル Dockerfile からビルドする設定
+    build:
+      context: .
+      dockerfile: Dockerfile  # 必要に応じてファイル名変更
 
-    # gh-ost 実行コマンド
+    # gh-ost を実行するコマンド
     command: >
       gh-ost
         --allow-on-master
@@ -19,16 +22,20 @@ services:
         --switch-to-rbr
         --execute
 
-    # 既存コンテナを参照するために depends_on を指定 (ただし、外部コンテナの場合は実際には機能しません)
-    # 同じ docker-compose 内に MySQL サービスが定義されていない場合でも、名前解決とネットワークが合っていれば接続可能です
-    depends_on:
-      - ${MYSQL_CONTAINER}
+    # 環境変数をサービスに渡す
+    environment:
+      MYSQL_NETWORK: ${MYSQL_NETWORK}
+      MYSQL_CONTAINER: ${MYSQL_CONTAINER}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_TABLE: ${MYSQL_TABLE}
+      GH_OST_ALTER: ${GH_OST_ALTER}
 
-    # ネットワーク設定
+    # 既存の外部ネットワークを使用
     networks:
       - default
 
-# ネットワーク設定 (すでに外部で作成されているネットワーク名を使いたい場合)
 networks:
   default:
     name: ${MYSQL_NETWORK}
